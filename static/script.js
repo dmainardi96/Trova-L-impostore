@@ -1,4 +1,4 @@
-const socket = io.connect("http://localhost:5000");
+const socket = io.connect(window.location.origin, { transports: ["websocket"] });
 const nome = ''
 
 async function creaStanza() {

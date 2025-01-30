@@ -3,8 +3,11 @@ from flask_socketio import SocketIO, join_room, emit
 import random
 
 app = Flask(__name__)
-socketio = SocketIO(app, cors_allowed_origins="*")
-
+socketio = SocketIO(
+    app,
+    cors_allowed_origins="*",
+    async_mode="eventlet"  # Usa "eventlet" per supporto WebSocket su Render
+)
 stanze = {}
 
 CATEGORIE = {
