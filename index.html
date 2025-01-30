@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trova l'Impostore</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.4.1/socket.io.js"></script>
+</head>
+<body>
+    <h1>Trova l'Impostore</h1>
+
+    <div id="creazione">
+        <input type="text" id="parola" placeholder="Inserisci la parola segreta">
+        <button onclick="creaStanza()">Crea Stanza</button>
+    </div>
+
+    <div id="unione">
+        <input type="text" id="codice" placeholder="Codice Stanza">
+        <input type="text" id="nome" placeholder="Il tuo Nome">
+        <button onclick="unisciti()">Unisciti</button>
+    </div>
+
+    <div id="gioco" style="display: none;">
+        <h2 id="stato"></h2>
+        <button onclick="iniziaGioco()">Inizia Partita</button>
+    </div>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
