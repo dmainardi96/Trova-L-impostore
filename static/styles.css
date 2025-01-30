@@ -1,10 +1,96 @@
+/* Sfondo con texture */
 body {
-    font-family: Arial, sans-serif;
+    background: url("bg-texture.jpg") no-repeat center center fixed;
+    background-size: cover;
+    font-family: 'Arial', sans-serif;
     text-align: center;
-    margin: 20px;
+    color: white;
 }
 
-input, button {
+/* Centrare il logo */
+#logo {
+    display: block;
+    margin: 20px auto; /* Margine superiore e inferiore */
+    width: 300px; /* Regola la dimensione del logo */
+    height: auto;
+}
+
+/* Contenitore principale */
+#container {
+    background: rgba(0, 0, 0, 0.6);  /* Semi-trasparente */
+    padding: 20px;
+    border-radius: 10px;
+    display: inline-block;
+    margin-top: 30px;
+}
+
+/* Pulsanti */
+/* Pulsanti */
+button {
+    padding: 10px 20px;
+    margin: 10px;
+    font-size: 18px;
+    cursor: pointer;
+    background: #ff4747;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    transition: background 0.3s;
+}
+
+button:hover {
+    background: #ff6b6b; /* Colore più chiaro al passaggio del mouse */
+}
+
+/* Input */
+input {
     padding: 10px;
     margin: 5px;
+    font-size: 16px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
 }
+
+/* Pulsante di copia */
+#copy-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 20px;
+    color: white;
+    margin-left: 10px;
+}
+
+#copy-btn:hover {
+    color: #ff4747;
+}
+
+#stanza-codice {
+    display: inline-block;
+    background-color: #444; /* Colore di sfondo simile ai pulsanti */
+    color: white;          /* Colore del testo */
+    padding: 8px 12px;     /* Spazio interno */
+    margin-left: 10px;     /* Spazio dal pulsante di creazione */
+    border-radius: 5px;    /* Angoli arrotondati */
+    font-size: 16px;       /* Dimensione del font */
+    font-weight: bold;     /* Testo in grassetto */
+}
+
+/* Nasconde il player audio */
+audio {
+    display: none;
+}
+
+
+#giocatori-lista {
+    text-align: left;
+    list-style-type: none;
+    padding-left: 0;
+    margin-left: 20px;
+}
+
+#giocatori-lista li {
+    font-size: 18px;
+    padding: 5px 0;
+}
+

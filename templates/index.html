@@ -4,28 +4,50 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Trova l'Impostore</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.4.1/socket.io.js"></script>
+    <script src="{{ url_for('static', filename='script.js') }}" defer></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <script src="{{ url_for('static', filename='script.js') }}" defer></script>
 </head>
 <body>
-    <h1>Trova l'Impostore</h1>
+    <!-- Musica di sottofondo -->
+    <audio id="bg-music" loop>
+        <source src="{{ url_for('static', filename='music.mp3') }}" type="audio/mp3">
+    </audio>
 
-    <div id="creazione">
-        <input type="text" id="parola" placeholder="Inserisci la parola segreta">
-        <button onclick="creaStanza()">Crea Stanza</button>
+    <div id="container">
+        <img id="logo" src="{{ url_for('static', filename='logo.png') }}" alt="Trova l'Impostore">
+
+        <!-- Creazione della stanza -->
+        <div id="crea-stanza">
+            <button onclick="creaStanza()">Crea Stanza</button>
+            <span id="stanza-codice" style="display:none;"></span>
+            <button id="copy-btn" onclick="copiaCodice()" style="display:none;">
+                <i class="fa-solid fa-copy"></i> <!-- Icona di copia FontAwesome -->
+            </button>
+        </div>
+
+        <!-- Unirsi a una stanza -->
+        <div id="unisciti">
+            <input type="text" id="codice" placeholder="Codice Stanza">
+            <input type="text" id="nome" placeholder="Il tuo Nome">
+            <button onclick="unisciti()">Unisciti</button>
+        </div>
+
+        <!-- Informazioni sulla stanza -->
+        <div id="gioco" style="display: none;">
+            <h2>Giocatori nella stanza:</h2>
+            <ul id="giocatori-lista"></ul>
+
+            <button id="inizia-gioco" onclick="iniziaGioco()" style="display: none;">Inizia Partita</button>
+
+            <div id="parola-container" style="display: none;">
+                <h2 id="parola"></h2>
+                <h3 id="categoria"></h3>
+            </div>
+
+        </div>
     </div>
-
-    <div id="unione">
-        <input type="text" id="codice" placeholder="Codice Stanza">
-        <input type="text" id="nome" placeholder="Il tuo Nome">
-        <button onclick="unisciti()">Unisciti</button>
-    </div>
-
-    <div id="gioco" style="display: none;">
-        <h2 id="stato"></h2>
-        <button onclick="iniziaGioco()">Inizia Partita</button>
-    </div>
-
-    <script src="{{ url_for('static', filename='script.js') }}"></script>
 </body>
 </html>
