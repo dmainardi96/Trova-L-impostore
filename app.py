@@ -121,8 +121,9 @@ def gestisci_partita():
     categoria = random.choice(categorie_disponibili)
 
     # Seleziona una coppia di parole (parola normale, variante impostore)
-    parola_coppia = random.choice(CATEGORIE[categoria])
-    parola_segreta, parola_variante = parola_coppia
+    parola_coppia = list(random.choice(CATEGORIE[categoria]))  # Converte la tupla in una lista
+    random.shuffle(parola_coppia)  # Mescola la coppia
+    parola_segreta, parola_variante = parola_coppia[0], parola_coppia[1]  # Ora è casuale
 
     stanze[codice]["parola"] = parola_segreta
     stanze[codice]["categoria"] = categoria
