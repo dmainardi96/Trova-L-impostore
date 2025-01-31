@@ -94,3 +94,177 @@ audio {
     padding: 5px 0;
 }
 
+#inizia-gioco {
+    font-size: 1.5rem;  /* Testo grande */
+    padding: 15px 30px;  /* Grande spazio intorno al testo */
+    background-color: #ff4500;  /* Rosso acceso */
+    color: white;  /* Testo bianco */
+    border: none;
+    border-radius: 15px;  /* Angoli arrotondati */
+    box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.3);  /* Ombra per effetto 3D */
+    text-transform: uppercase;  /* Testo in maiuscolo */
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease-in-out;
+}
+
+/* Effetto quando il mouse passa sopra */
+#inizia-gioco:hover {
+    background-color: #ff6347;  /* Rosso più chiaro */
+    transform: scale(1.1);  /* Ingrandisce leggermente */
+}
+
+/* Effetto quando viene premuto */
+#inizia-gioco:active {
+    transform: scale(0.95);  /* Effetto pressione */
+}
+
+/* Stile per il pulsante principale */
+#dropdown-btn {
+    font-size: 1rem;
+    padding: 10px 15px;
+    background-color: #ff4500;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.3s ease-in-out;
+}
+
+#dropdown-btn:hover {
+    background-color: #ff6347;
+}
+
+/* Stile del menu dropdown */
+.dropdown-content {
+    display: none;
+    position: absolute;
+    background-color: #222; /* Sfondo scuro */
+    color: white; /* Testo chiaro */
+    min-width: 220px;
+    box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.3);
+    border-radius: 5px;
+    overflow: hidden;
+    padding: 10px;
+    z-index: 10;
+}
+
+/* Stile delle opzioni */
+.dropdown-content option {
+    padding: 10px;
+    display: block;
+    cursor: pointer;
+    font-size: 1rem;
+    background: #222; /* Sfondo uguale al contenitore */
+    color: white; /* Testo leggibile */
+    border: none;
+}
+
+.dropdown-content option:hover {
+    background-color: #ff6347; /* Cambia colore al passaggio del mouse */
+}
+
+#settings-button {
+    background-color: #222; /* Sfondo scuro */
+    border: none;
+    color: white;
+    font-size: 24px; /* Dimensione icona */
+    padding: 10px;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: all 0.3s ease-in-out;
+}
+
+#settings-button:hover {
+    background-color: #ff4500; /* Cambia colore quando il mouse passa sopra */
+}
+
+#settings-container {
+    display: flex;
+    align-items: center; /* Allinea verticalmente gli elementi */
+    justify-content: center; /* Centra orizzontalmente */
+    gap: 10px; /* Distanza tra i pulsanti */
+    margin-bottom: 15px;
+}
+
+#settings-button {
+    background-color: #222;
+    border: none;
+    color: white;
+    font-size: 24px;
+    padding: 10px;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: all 0.3s ease-in-out;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+}
+
+#settings-button:hover {
+    background-color: #ff4500;
+}
+
+#crea-stanza-btn {
+    background-color: #ff4500;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    font-size: 16px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.codice-box {
+    background: #444;
+    color: white;
+    padding: 8px 12px;
+    border-radius: 5px;
+    font-weight: bold;
+}
+
+#popup-categorie {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(0, 0, 0, 0.9);
+    padding: 20px;
+    border-radius: 10px;
+    z-index: 1000;
+    width: 320px;
+    text-align: center;
+    color: white;
+}
+
+.popup-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+#categorie-opzioni {
+    max-height: 200px;
+    overflow-y: auto;
+    text-align: left;
+    width: 100%;
+    padding: 10px;
+}
+
+.categoria-checkbox {
+    display: block;
+    margin: 5px 0;
+}
+
+#popup-categorie button {
+    margin: 10px;
+    padding: 10px;
+    background: orange;
+    border: none;
+    color: black;
+    font-weight: bold;
+    cursor: pointer;
+    border-radius: 5px;
+}

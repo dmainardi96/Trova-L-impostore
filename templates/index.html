@@ -20,13 +20,14 @@
         <img id="logo" src="{{ url_for('static', filename='logo.png') }}" alt="Trova l'Impostore">
 
         <!-- Creazione della stanza -->
-        <div id="crea-stanza">
-            <button onclick="creaStanza()">Crea Stanza</button>
-            <span id="stanza-codice" style="display:none;"></span>
-            <button id="copy-btn" onclick="copiaCodice()" style="display:none;">
-                <i class="fa-solid fa-copy"></i> <!-- Icona di copia FontAwesome -->
+        <div id="settings-container">
+            <button id="settings-button" onclick="mostraPopupCategorie()">
+                <i class="fa-solid fa-gear"></i>
             </button>
+            <button id="crea-stanza-btn" onclick="creaStanza()">Crea Stanza</button>
+            <span id="stanza-codice" class="codice-box" style="display: none;">Codice: <span id="codice-text"></span></span>
         </div>
+
 
         <!-- Unirsi a una stanza -->
         <div id="unisciti">
@@ -37,15 +38,25 @@
 
         <!-- Informazioni sulla stanza -->
         <div id="gioco" style="display: none;">
-            <h2>Giocatori nella stanza:</h2>
-            <ul id="giocatori-lista"></ul>
-
-            <button id="inizia-gioco" onclick="iniziaGioco()" style="display: none;">Inizia Partita</button>
-
             <div id="parola-container" style="display: none;">
                 <h2 id="parola"></h2>
                 <h3 id="categoria"></h3>
             </div>
+
+            <hr>
+
+            <h2>Giocatori nella stanza:</h2>
+            <ul id="giocatori-lista"></ul>
+
+        <div id="punteggio-container" style="display: none; position: relative;">
+            <button id="dropdown-btn">Assegna Punti ▼</button>
+            <div id="dropdown-menu" class="dropdown-content">
+                <option value="impostore_fugge">Impostore è fuggito</option>
+                <option value="impostore_indovina">Impostore catturato, ma ha indovinato</option>
+                <option value="impostore_non_indovina">Impostore catturato e ha sbagliato</option>
+            </div>
+        </div><br>
+        <button id="inizia-gioco" onclick="gestisciPartita()" style="display: none;">Inizia Partita</button>
 
         </div>
     </div>
