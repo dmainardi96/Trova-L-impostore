@@ -2,83 +2,14 @@ from flask import Flask, render_template, request, jsonify
 from flask_socketio import SocketIO, join_room, emit
 import random
 
+from config import CATEGORIE, stanze, EMOJIS, SOPRANNOMI, DEBUG, client_sessions
+
 app = Flask(__name__)
 socketio = SocketIO(
     app,
     cors_allowed_origins="*",
     async_mode="eventlet"  # Usa "eventlet" per supporto WebSocket su Render
 )
-stanze = {}
-
-CATEGORIE = {
-    "Animali": ["Leone", "Giraffa", "Panda", "Tigre", "Elefante", "Canguro", "Lupo", "Volpe", "Pinguino", "Orso Polare",
-                "Delfino", "Aquila"],
-    "Oggetti": ["Telefono", "Orologio", "Zaino", "Sedia", "Computer", "Lampada", "Chitarra", "Bicicletta", "Forbici",
-                "Microonde", "Telecomando"],
-    "Cibi": ["Pizza", "Pasta", "Gelato", "Hamburger", "Sushi", "Cioccolato", "Lasagna", "Hot Dog", "Torta", "Insalata",
-             "Patatine", "Frittata"],
-    "Film": ["Titanic", "Inception", "Matrix", "Interstellar", "Pulp Fiction", "Il Padrino", "Avatar", "Jurassic Park",
-             "Star Wars", "Harry Potter"],
-    "Personaggi Famosi": ["Albert Einstein", "Leonardo da Vinci", "Elvis Presley", "Michael Jackson", "Napoleone",
-                          "Cristoforo Colombo", "Cleopatra"],
-    "Personaggi di Finzione": ["Batman", "Superman", "Sherlock Holmes", "Harry Potter", "Darth Vader", "Spiderman",
-                               "Topolino", "Gandalf", "Homer Simpson"],
-    "Luoghi": ["Roma", "New York", "Tokyo", "Parigi", "Londra", "Sydney", "Pechino", "Mosca", "Rio de Janeiro", "Dubai",
-               "Berlino", "Los Angeles"],
-    "Sport": ["Calcio", "Basket", "Tennis", "Nuoto", "Atletica", "Sci", "Golf", "Boxe", "Motociclismo", "Rugby",
-              "Pallavolo"],
-    "Videogiochi": ["Super Mario", "Minecraft", "Fortnite", "The Legend of Zelda", "GTA", "League of Legends",
-                    "Call of Duty", "Pac-Man", "Doom", "Tetris"],
-    "Miti e Leggende": ["Medusa", "Thor", "Zeus", "Pegaso", "Fenice", "Bigfoot", "Dracula", "Nessie", "Minotauro",
-                        "Ciclopi", "Chupacabra"],
-    "Emozioni e Sentimenti": ["Felicità", "Tristezza", "Paura", "Rabbia", "Amore", "Noia", "Gelosia", "Ansia",
-                              "Sorpresa", "Timidezza"]
-}
-
-EMOJIS = [
-    "🕵️", "🕶️", "🧐", "👻", "🎭", "😎", "🦹", "🥷", "🤖", "👀", "🦸", "👺", "🐱‍👤", "🐲", "🐸", "🐍", "🐒", "🎭",
-    "🦉", "🦡", "🦦", "🦘", "🦨", "🦩", "🦚", "🦜", "🦢", "🐉", "🐺", "🐙", "🐠", "🦈", "🐬", "🐲", "🦏", "🐘", "🦛",
-    "🤡", "🎃", "🦹‍♂️", "🦹‍♀️", "🦸‍♂️", "🦸‍♀️", "😈", "👾", "💀", "👽", "👑", "👁️", "🦄", "🐧", "🐼", "🐨", "🦔"
-]
-
-SOPRANNOMI = [
-    "sarà sicuro l'impostore...",
-    "tranquilli, non sa bluffare",
-    "il cacciatore di passere",
-    "la piccola fiammiferaia",
-    "agente 00 tette",
-    ", la mia fatina preferita",
-    "mangia spaghetti professionista",
-    "il ninja delle fogne",
-    "il finto vegano",
-    "re dei bidoni",
-    "campione mondiale di nascondino",
-    "ladro di patatine",
-    "più lento di una tartaruga",
-    "la volpe astuta",
-    "il detective senza indizi",
-    "quello che non capisce le battute",
-    "lo stratega dell'ultimo secondo",
-    "l’ombra nella notte",
-    "quello che fa sempre finta di sapere",
-    "il maestro dei tranelli",
-    "il bugiardo più onesto",
-    "non ha mai visto un film di spionaggio",
-    "il re del bluff (o forse no?)",
-    "il fuggitivo senza meta",
-    "sempre sospetto ma mai colpevole",
-    "quello che dice sempre 'non sono io!'",
-    "il mago delle scuse",
-    "fa finta di capire il gioco",
-    "quello che dimentica sempre le regole",
-    "la mente criminale (o solo casualità?)"
-]
-
-# Mappa per associare gli utenti alle loro sessioni di Socket.IO
-client_sessions = {}
-
-DEBUG = True
-
 
 @app.route("/")
 def home():
@@ -98,24 +29,20 @@ def handle_connect():
 
 @app.route("/crea_stanza", methods=["POST"])
 def crea_stanza():
-    data = request.json
-    categorie_scelte = data.get("categorie", list(CATEGORIE.keys()))  # Se nessuna scelta, usa tutte
-
-    if not categorie_scelte:
-        return jsonify({"errore": "Devi selezionare almeno una categoria!"}), 400
-
     codice = str(random.randint(1000, 9999))
 
     # Salva solo le categorie scelte nella stanza
     stanze[codice] = {
-        "categorie_scelte": categorie_scelte,
+        "categorie_scelte": list(CATEGORIE.keys()),
         "parola": None,
         "categoria": None,
         "giocatori": {},
         "impostore": None,
         "parole_usate": [],
         "punteggi": {},
-        "punteggio_assegnato": False
+        "punteggio_assegnato": False,
+        "modalita": None,
+        "num_impostori": 1
     }
 
     return jsonify({"codice": codice})
@@ -172,7 +99,6 @@ def unisciti():
 
 @app.route("/gestisci_partita", methods=["POST"])
 def gestisci_partita():
-    """Avvia la partita (se prima volta) o genera una nuova parola per la stanza"""
     data = request.json
     codice = data["codice"]
 
@@ -180,18 +106,18 @@ def gestisci_partita():
         return jsonify({"errore": "Stanza inesistente"}), 400
 
     # Filtra le categorie disponibili in base a quelle scelte dall'host
-    categorie_disponibili = {c: CATEGORIE[c] for c in stanze[codice]["categorie_scelte"] if c in CATEGORIE}
+    categorie_disponibili = [c for c in stanze[codice]["categorie_scelte"] if c in CATEGORIE]
+
     if not categorie_disponibili:
         return jsonify({"errore": "Nessuna categoria valida selezionata!"}), 400
 
-    categoria, parole = random.choice(list(categorie_disponibili.items()))
+    # Seleziona una categoria casuale
+    categoria = random.choice(categorie_disponibili)
 
-    # Evita parole già usate
-    parole_disponibili = [p for p in parole if p not in stanze[codice]["parole_usate"]]
-    if not parole_disponibili:
-        return jsonify({"errore": "Nessuna parola disponibile, cambia categoria!"}), 400
+    # Seleziona una coppia di parole (parola normale, variante impostore)
+    parola_coppia = random.choice(CATEGORIE[categoria])
+    parola_segreta, parola_variante = parola_coppia
 
-    parola_segreta = random.choice(parole_disponibili)
     stanze[codice]["parola"] = parola_segreta
     stanze[codice]["categoria"] = categoria
     stanze[codice]["parole_usate"].append(parola_segreta)
@@ -201,25 +127,30 @@ def gestisci_partita():
     if len(giocatori) < 2 and not DEBUG:
         return jsonify({"errore": "Servono almeno 2 giocatori per iniziare"}), 400
 
-    impostore = random.choice(giocatori)
-    stanze[codice]["impostore"] = impostore
+    num_impostori = min(stanze[codice]["num_impostori"], len(giocatori) - 1)
+    stanze[codice]["impostori"] = random.sample(giocatori, num_impostori)
     stanze[codice]["punteggio_assegnato"] = False  # Resetta la possibilità di assegnare punti
 
-    # Invia la parola segreta a tutti i giocatori della stanza
+    # Se modalità "Little Secret", impostore riceve una parola diversa
+    parola_impostore = parola_segreta
+    if stanze[codice].get("modalita") == "little_secret":
+        parola_impostore = parola_variante
+
+    # Invia le parole ai giocatori
     for sid, info in client_sessions.items():
         if info["codice"] == codice:
-            if info["nome"] == impostore:
-                socketio.emit("parola_segreta", {
-                    "categoria": categoria,
-                    "parola": " 👀 Sei l'IMPOSTORE! Non conosci la parola. 👀"
-                }, to=sid)
+            if info["nome"] in stanze[codice]["impostori"]:
+                parola = parola_impostore if stanze[codice].get("modalita") == "little_secret" else " 👀 Sei l'IMPOSTORE! Non conosci la parola. 👀"
             else:
-                socketio.emit("parola_segreta", {
-                    "categoria": categoria,
-                    "parola": parola_segreta
-                }, to=sid)
+                parola = parola_segreta
+
+            socketio.emit("parola_segreta", {"categoria": categoria,
+                                             "parola": parola,
+                                             "imposter": info["nome"] in stanze[codice]["impostori"]}, to=sid)
+
 
     return jsonify({"successo": True, "parola": parola_segreta, "categoria": categoria})
+
 
 
 @socketio.on("join_room")
@@ -238,29 +169,66 @@ def join_room_event(data):
 def assegna_punti():
     data = request.json
     codice = data["codice"]
-    esito = data["esito"]  # "impostore_fugge", "impostore_indovina", "impostore_non_indovina"
+    esito = data["esito"]
 
     if codice not in stanze or stanze[codice]["punteggio_assegnato"]:
         return jsonify({"errore": "Punti già assegnati o stanza inesistente"}), 400
 
-    impostore = stanze[codice]["impostore"]
+    impostori = stanze[codice]["impostori"]
     giocatori = stanze[codice]["giocatori"]
 
     if esito == "impostore_fugge":
-        stanze[codice]["punteggi"][impostore] = stanze[codice]["punteggi"].get(impostore, 0) + 2
+        for impostore in impostori:
+            stanze[codice]["punteggi"][impostore] = stanze[codice]["punteggi"].get(impostore, 0) + 2
     elif esito == "impostore_indovina":
-        stanze[codice]["punteggi"][impostore] = stanze[codice]["punteggi"].get(impostore, 0) + 1
+        for impostore in impostori:
+            stanze[codice]["punteggi"][impostore] = stanze[codice]["punteggi"].get(impostore, 0) + 1
     elif esito == "impostore_non_indovina":
-        stanze[codice]["punteggi"][impostore] = stanze[codice]["punteggi"].get(impostore, 0)
+        for impostore in impostori:
+            stanze[codice]["punteggi"][impostore] = stanze[codice]["punteggi"].get(impostore, 0)
         for giocatore in giocatori:
-            if giocatore != impostore:
+            if giocatore not in impostori:
                 stanze[codice]["punteggi"][giocatore] = stanze[codice]["punteggi"].get(giocatore, 0) + 2
 
-    stanze[codice]["punteggio_assegnato"] = True  # Blocca doppia assegnazione
+    stanze[codice]["punteggio_assegnato"] = True
 
     aggiorna_giocatori(codice)
 
     return jsonify({"successo": True})
+
+
+@app.route("/modifica_impostazioni", methods=["POST"])
+def modifica_impostazioni():
+    data = request.json
+    codice = data.get("codice")
+    nuove_impostazioni = data.get("impostazioni")
+    print(nuove_impostazioni)
+    if codice not in stanze:
+        return jsonify({"errore": "Stanza inesistente"}), 400
+
+    for chiave, valore in nuove_impostazioni.items():
+        if chiave == "num_impostori":
+            stanze[codice][chiave] = int(valore)  # Cast a int qui
+        elif chiave in ["categorie_scelte", "modalita"]:
+            stanze[codice][chiave] = valore
+
+    socketio.emit("aggiorna_impostazioni", {"impostazioni": nuove_impostazioni}, room=codice)
+    return jsonify({"successo": True, "messaggio": "Impostazioni aggiornate"})
+
+
+@app.route("/verifica_impostore", methods=["POST"])
+def verifica_impostore():
+    data = request.json
+    codice = data["codice"]
+    nome = data["nome"]
+
+    if codice not in stanze or nome not in stanze[codice]["giocatori"]:
+        return jsonify({"errore": "Giocatore o stanza non trovati."}), 400
+
+    impostore = stanze[codice]["impostore"]
+    e_impostore = (nome == impostore)
+
+    return jsonify({"successo": True, "impostore": e_impostore})
 
 
 if __name__ == "__main__":

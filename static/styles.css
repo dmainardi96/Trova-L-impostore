@@ -225,46 +225,67 @@ audio {
     font-weight: bold;
 }
 
-#popup-categorie {
+/* Sfondo scuro quando il popup è aperto */
+#overlay {
+    display: none; /* Di default è nascosto */
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    z-index: 1000; /* Sopra tutto */
+}
+
+/* Stile del popup */
+#popup-impostazioni {
+    display: none;
     position: fixed;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    background: rgba(0, 0, 0, 0.9);
+    width: 400px;
+    background: #222;
     padding: 20px;
     border-radius: 10px;
-    z-index: 1000;
-    width: 320px;
+    z-index: 1001; /* Sopra l'overlay */
+    box-shadow: 0px 0px 10px rgba(255, 255, 255, 0.2);
     text-align: center;
+}
+
+/* Tasto di chiusura */
+#popup-impostazioni .close-btn {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    font-size: 20px;
+    cursor: pointer;
     color: white;
 }
 
-.popup-content {
+/* Stile per i checkbox delle categorie */
+#categorie div {
     display: flex;
-    flex-direction: column;
     align-items: center;
-}
-
-#categorie-opzioni {
-    max-height: 200px;
-    overflow-y: auto;
-    text-align: left;
-    width: 100%;
-    padding: 10px;
-}
-
-.categoria-checkbox {
-    display: block;
     margin: 5px 0;
 }
 
-#popup-categorie button {
-    margin: 10px;
-    padding: 10px;
-    background: orange;
+#categorie input {
+    margin-right: 10px;
+}
+
+/* Bottoni nel popup */
+#popup-impostazioni button {
+    background: #ff4747;
+    color: white;
     border: none;
-    color: black;
-    font-weight: bold;
-    cursor: pointer;
+    padding: 10px 15px;
+    margin: 10px;
     border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+#popup-impostazioni button:hover {
+    background: #ff2f2f;
 }

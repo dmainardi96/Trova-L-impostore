@@ -2,13 +2,9 @@ const socket = io.connect(window.location.origin, { transports: ["websocket"] })
 const nome = ''
 
 async function creaStanza() {
-    let categorieScelte = JSON.parse(localStorage.getItem("categorie_scelte")) || [];
-
-
     let response = await fetch("/crea_stanza", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ categorie: categorieScelte })
+        headers: { "Content-Type": "application/json" }
     });
 
     let data = await response.json();
@@ -47,6 +43,7 @@ function setCookie(name, value, days) {
 async function unisciti() {
     let codice = document.getElementById("codice").value;
     let nome = document.getElementById("nome").value;
+    sessionStorage.setItem("nome_utente", nome);
 
     let playerId = getCookie("player_id");
     if (!playerId) {
@@ -102,6 +99,8 @@ async function gestisciPartita() {
         document.getElementById("inizia-gioco").innerText = "Nuova Parola"; // Nasconde il pulsante dopo l'inizio del gioco
         avviaMusica();  // Avvia la musica solo se non sta già suonando
         document.getElementById("punteggio-container").style.display = "inline-block";
+        document.getElementById("sei-impostore").style.display = "none";
+        document.getElementById("btn-impostore").style.display = "inline-block";
     } else {
         alert(data.errore);
     }
@@ -112,6 +111,13 @@ socket.on("parola_segreta", function(data) {
     document.getElementById("parola-container").style.display = "block";
     document.getElementById("categoria").innerText = `Categoria: ${data.categoria}`;
     document.getElementById("parola").innerText = data.parola;
+            document.getElementById("sei-impostore").style.display = "none";
+            document.getElementById("btn-impostore").style.display = "inline-block";
+    if (data.imposter) {
+        document.getElementById("sei-impostore").innerText = "Sei un impostore!";
+    } else {
+        document.getElementById("sei-impostore").innerText = "Sei buono!";
+    }
 });
 
 function avviaMusica() {
@@ -173,47 +179,75 @@ document.getElementById("dropdown-menu").addEventListener("click", function(even
       });
 });
 
-async function mostraPopupCategorie() {
-    // Controlla se il popup è già aperto
-    if (document.getElementById("popup-categorie")) return;
+function apriPopupImpostazioni() {
+    fetch("/categorie_disponibili")
+        .then(response => response.json())
+        .then(data => {
+            let categorieDiv = document.getElementById("categorie");
+            categorieDiv.innerHTML = ""; // Pulisce il div prima di riempirlo
 
-    let response = await fetch("/categorie_disponibili");
-    let data = await response.json();
-    let categorie = data.categorie;
+            data.categorie.forEach(categoria => {
+                let checkbox = document.createElement("input");
+                checkbox.type = "checkbox";
+                checkbox.value = categoria;
+                checkbox.id = "cat-" + categoria;
 
-    let popup = document.createElement("div");
-    popup.id = "popup-categorie";
-    popup.innerHTML = `
-        <div class="popup-content">
-            <h2>Impostazioni della Stanza</h2>
-            <div id="categorie-opzioni">
-            Categorie:
-                ${categorie.map(cat => `
-                    <div class="categoria-checkbox">
-                        <label><input type="checkbox" value="${cat}" checked> ${cat}</label>
-                    </div>
-                `).join("")}
-            </div>
-            <button onclick="salvaImpostazioni()">Salva Impostazioni</button>
-            <button onclick="chiudiPopup()">Chiudi</button>
-        </div>
-    `;
+                let label = document.createElement("label");
+                label.htmlFor = "cat-" + categoria;
+                label.textContent = categoria;
 
-    document.body.appendChild(popup);
+                let div = document.createElement("div");
+                div.appendChild(checkbox);
+                div.appendChild(label);
+                categorieDiv.appendChild(div);
+            });
+        });
+
+    // Mostra il popup e l'overlay
+    document.getElementById("popup-impostazioni").style.display = "block";
+    document.getElementById("overlay").style.display = "block";
 }
 
 function chiudiPopup() {
-    let popup = document.getElementById("popup-categorie");
-    if (popup) popup.remove();
+    document.getElementById("popup-impostazioni").style.display = "none";
+    document.getElementById("overlay").style.display = "none";
 }
 
-// Funzione per salvare le impostazioni selezionate
-function salvaImpostazioni() {
-    let categorieScelte = [];
-    document.querySelectorAll("#categorie-opzioni input:checked").forEach(checkbox => {
-        categorieScelte.push(checkbox.value);
+async function salvaImpostazioni() {
+    let codice = sessionStorage.getItem("stanza_creata");
+    if (!codice) {
+        alert("Devi prima creare una stanza!");
+        return;
+    }
+
+    let categorieScelte = Array.from(document.querySelectorAll("#categorie input:checked"))
+                               .map(el => el.value);
+
+    let modalitaSelezionata = document.querySelector('input[name="modalita"]:checked').value;
+
+    let numImpostori = parseInt(document.querySelector('input[name="num-impostori"]').value);
+
+    if (categorieScelte.length === 0) {
+        alert("Seleziona almeno una categoria!");
+        return;
+    }
+
+    let response = await fetch("/modifica_impostazioni", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+            codice: codice,
+            impostazioni: { categorie_scelte: categorieScelte,
+                modalita: modalitaSelezionata,
+                num_impostori: numImpostori }
+        })
     });
 
-    localStorage.setItem("categorie_scelte", JSON.stringify(categorieScelte)); // Salva localmente
+    let data = await response.json();
     chiudiPopup();
+}
+
+async function verificaImpostore() {
+    document.getElementById("sei-impostore").style.display = "inline-block";
+    document.getElementById("btn-impostore").style.display = "none";
 }

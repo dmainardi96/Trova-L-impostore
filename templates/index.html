@@ -21,9 +21,38 @@
 
         <!-- Creazione della stanza -->
         <div id="settings-container">
-            <button id="settings-button" onclick="mostraPopupCategorie()">
-                <i class="fa-solid fa-gear"></i>
+            <!-- Bottone per aprire le impostazioni -->
+            <button id="impostazioni-btn" onclick="apriPopupImpostazioni()">
+                <i class="fa-solid fa-gear"></i> Impostazioni
             </button>
+
+            <!-- Overlay per scurire lo sfondo quando il popup è aperto -->
+            <div id="overlay" onclick="chiudiPopup()"></div>
+
+            <!-- Popup delle impostazioni -->
+            <div id="popup-impostazioni">
+                <span class="close-btn" onclick="chiudiPopup()">&times;</span>
+                <h2>Impostazioni della Stanza</h2>
+
+                <label>Categorie disponibili:</label>
+                <div id="categorie"></div>
+
+                <label>Modalità di gioco:</label>
+                <div id="modalita">
+                    <input type="radio" id="camaleonte" name="modalita" value="camaleonte" checked>
+                    <label for="camaleonte">Camaleonte (normale)</label>
+
+                    <input type="radio" id="little_secret" name="modalita" value="little_secret">
+                    <label for="little_secret">Little Secret (impostore con parola simile)</label>
+                </div>
+
+                <!-- Scelta numero impostori -->
+                <label for="num_impostori">Numero di Impostori:</label>
+                <input type="number" name="num-impostori" id="num-impostori" min="1" max="300">
+
+                <button onclick="salvaImpostazioni()">Salva Impostazioni</button>
+            </div>
+
             <button id="crea-stanza-btn" onclick="creaStanza()">Crea Stanza</button>
             <span id="stanza-codice" class="codice-box" style="display: none;">Codice: <span id="codice-text"></span></span>
         </div>
@@ -56,6 +85,18 @@
                 <option value="impostore_non_indovina">Impostore catturato e ha sbagliato</option>
             </div>
         </div><br>
+
+        <!-- Bottone "Sei l'impostore?" -->
+
+        <h4 id="sei-impostore" style="display:none;">Sei buono!</h4>
+        <button id="btn-impostore" onclick="verificaImpostore()">
+            Sei l'impostore?
+        </button>
+
+        <!-- Messaggio per mostrare il risultato -->
+        <p id="risultato-impostore" style="display:none; font-weight: bold;"></p>
+        <br>
+
         <button id="inizia-gioco" onclick="gestisciPartita()" style="display: none;">Inizia Partita</button>
 
         </div>
