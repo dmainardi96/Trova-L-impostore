@@ -81,8 +81,14 @@ def unisciti():
     if codice not in stanze:
         return jsonify({"errore": "Stanza inesistente"}), 400
 
+    # Se il nome esiste già, semplicemente lo ricolleghiamo alla stanza
     if nome in stanze[codice]["giocatori"]:
-        return jsonify({"errore": "Nome già usato nella stanza"}), 400
+        return jsonify({
+            "successo": True,
+            "soprannome": stanze[codice]["giocatori"][nome]["soprannome"],
+            "emoji": stanze[codice]["giocatori"][nome]["emoji"],
+            "nome": nome
+        })
 
     # Genera emoji e soprannome casuale
     emoji = random.choice(EMOJIS)
