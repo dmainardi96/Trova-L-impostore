@@ -44,11 +44,19 @@
 
                     <input type="radio" id="little_secret" name="modalita" value="little_secret">
                     <label for="little_secret">Little Secret (impostore con parola simile)</label>
+
+                    <input type="radio" id="domande" name="modalita" value="domande">
+                    <label for="domande">Domande</label>
                 </div>
 
                 <!-- Scelta numero impostori -->
                 <label for="num_impostori">Numero di Impostori:</label>
                 <input type="number" name="num-impostori" id="num-impostori" min="1" max="300">
+
+                <div id="ruoli-container">
+                    <h3>Seleziona i ruoli</h3>
+                    <div id="ruoli-list"></div>
+                </div>
 
                 <button onclick="salvaImpostazioni()">Salva Impostazioni</button>
             </div>
@@ -70,6 +78,8 @@
             <div id="parola-container" style="display: none;">
                 <h2 id="parola"></h2>
                 <h3 id="categoria"></h3>
+                <h3 id="ruolo-giocatore"></h3>
+                <div id="lista-ruoli"></div>
             </div>
 
             <hr>
@@ -83,6 +93,7 @@
                 <option value="impostore_fugge">Impostore è fuggito</option>
                 <option value="impostore_indovina">Impostore catturato, ma ha indovinato</option>
                 <option value="impostore_non_indovina">Impostore catturato e ha sbagliato</option>
+                <option value="clown_eliminato">Clown è eliminato</option>
             </div>
         </div><br>
 
@@ -90,7 +101,7 @@
 
         <h4 id="sei-impostore" style="display:none;">Sei buono!</h4>
         <button id="btn-impostore" onclick="verificaImpostore()">
-            Sei l'impostore?
+            Scopri il tuo ruolo / Scopri domande
         </button>
 
         <!-- Messaggio per mostrare il risultato -->

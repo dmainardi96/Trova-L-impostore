@@ -65,7 +65,9 @@ async function unisciti() {
 
         if (data.messaggio === "Utente già loggato") {
             document.getElementById("nome").value = data.nome;
-            alert("Utente già loggato, rientrato nella stanza!");
+        }
+        if (data.owner) {
+            document.getElementById("inizia-gioco").style.display = "inline";
         }
     } else {
         alert("Errore: " + data.errore);
@@ -86,11 +88,12 @@ socket.on("aggiorna_giocatori", function(data) {
 
 async function gestisciPartita() {
     let codice = sessionStorage.getItem("stanza_creata");
+    let nome = document.getElementById("nome").value;
 
     let response = await fetch("/gestisci_partita", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ codice: codice })
+        body: JSON.stringify({ codice: codice , nome: nome})
     });
 
     let data = await response.json();
@@ -111,14 +114,24 @@ socket.on("parola_segreta", function(data) {
     document.getElementById("parola-container").style.display = "block";
     document.getElementById("categoria").innerText = `Categoria: ${data.categoria}`;
     document.getElementById("parola").innerText = data.parola;
-            document.getElementById("sei-impostore").style.display = "none";
-            document.getElementById("btn-impostore").style.display = "inline-block";
-    if (data.imposter) {
-        document.getElementById("sei-impostore").innerText = "Sei un impostore!";
-    } else {
-        document.getElementById("sei-impostore").innerText = "Sei buono!";
+    document.getElementById("ruolo-giocatore").innerText = `Ruolo: ${data.ruolo}`;
+
+    // Mostra la lista dei ruoli disponibili
+    let ruoliLista = document.getElementById("lista-ruoli");
+    ruoliLista.innerHTML = "<h4>Ruoli disponibili:</h4>";
+    for (let ruolo in data.ruoli_partita) {
+        let p = document.createElement("p");
+        p.innerHTML = `<strong>${ruolo}:</strong> ${data.ruoli_partita[ruolo]}`;
+        ruoliLista.appendChild(p);
     }
+
+    document.getElementById("sei-impostore").style.display = "none";
+    document.getElementById("btn-impostore").style.display = "inline-block";
+    document.getElementById("sei-impostore").innerText = data.imposter;
+
 });
+
+
 
 function avviaMusica() {
     let audio = document.getElementById("bg-music");
@@ -179,7 +192,8 @@ document.getElementById("dropdown-menu").addEventListener("click", function(even
       });
 });
 
-function apriPopupImpostazioni() {
+async function apriPopupImpostazioni() {
+    // Caricamento delle categorie disponibili
     fetch("/categorie_disponibili")
         .then(response => response.json())
         .then(data => {
@@ -203,10 +217,35 @@ function apriPopupImpostazioni() {
             });
         });
 
+    // Caricamento dei ruoli disponibili
+    fetch("/ruoli_disponibili")
+        .then(response => response.json())
+        .then(data => {
+            let ruoliDiv = document.getElementById("ruoli-list");
+            ruoliDiv.innerHTML = ""; // Pulisce il div prima di riempirlo
+
+            for (let ruolo in data.ruoli) {
+                let checkbox = document.createElement("input");
+                checkbox.type = "checkbox";
+                checkbox.value = ruolo;
+                checkbox.id = "ruolo-" + ruolo;
+
+                let label = document.createElement("label");
+                label.htmlFor = "ruolo-" + ruolo;
+                label.innerHTML = `<strong>${ruolo}</strong> - <span class="descrizione">${data.ruoli[ruolo]}</span>`;
+
+                let div = document.createElement("div");
+                div.appendChild(checkbox);
+                div.appendChild(label);
+                ruoliDiv.appendChild(div);
+            }
+        });
+
     // Mostra il popup e l'overlay
     document.getElementById("popup-impostazioni").style.display = "block";
     document.getElementById("overlay").style.display = "block";
 }
+
 
 function chiudiPopup() {
     document.getElementById("popup-impostazioni").style.display = "none";
@@ -227,19 +266,20 @@ async function salvaImpostazioni() {
 
     let numImpostori = parseInt(document.querySelector('input[name="num-impostori"]').value);
 
-    if (categorieScelte.length === 0) {
-        alert("Seleziona almeno una categoria!");
-        return;
-    }
+    let ruoliScelti = Array.from(document.querySelectorAll("#ruoli-list input:checked"))
+                           .map(el => el.value);
 
     let response = await fetch("/modifica_impostazioni", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
             codice: codice,
-            impostazioni: { categorie_scelte: categorieScelte,
+            impostazioni: {
+                categorie_scelte: categorieScelte,
                 modalita: modalitaSelezionata,
-                num_impostori: numImpostori }
+                num_impostori: numImpostori,
+                ruoli_scelti: ruoliScelti
+            }
         })
     });
 
@@ -251,3 +291,4 @@ async function verificaImpostore() {
     document.getElementById("sei-impostore").style.display = "inline-block";
     document.getElementById("btn-impostore").style.display = "none";
 }
+

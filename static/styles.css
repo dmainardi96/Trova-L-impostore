@@ -251,7 +251,26 @@ audio {
     z-index: 1001; /* Sopra l'overlay */
     box-shadow: 0px 0px 10px rgba(255, 255, 255, 0.2);
     text-align: center;
+    scrollbar-width: thin;
+    scrollbar-color: #888 #333;
+    max-height: 80vh; /* Altezza massima relativa alla viewport */
+        overflow-y: auto; /* Abilita la scrollbar verticale */
 }
+
+/* Stile della scrollbar su Chrome, Edge e Safari */
+#popup-impostazioni::-webkit-scrollbar {
+    width: 8px;
+}
+
+#popup-impostazioni::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 4px;
+}
+
+#popup-impostazioni::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}
+
 
 /* Tasto di chiusura */
 #popup-impostazioni .close-btn {
